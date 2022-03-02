@@ -1,13 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt
-import sklearn
-import sklearn.neural_network
-import torch
-import warnings
 import pandas as pd
 import matplotlib.pyplot as plt
-from pandas.plotting import parallel_coordinates
-from pandas.plotting import radviz
+
 
 class Datasets:
     'save dataset\'s location'
@@ -32,6 +26,9 @@ class Datasets:
     def getFeatures(self):
         print("Features is : %s" % self.features)
         return self.features
+
+    def getData(self):
+        return self.data
 
     def displayData(self):
         df = pd.DataFrame({
