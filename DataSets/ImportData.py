@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-
+import seaborn as sns
 
 class Datasets:
     'save dataset\'s location'
@@ -46,11 +46,16 @@ class Datasets:
             self.features[11]: self.data[:, 11],
 
         })
-        print(df)
         '''
         pic = pd.plotting.radviz(df,'\"quality\"')
         plt.show()
         '''
         plt.figure(figsize = (20,8))
-        pd.plotting.parallel_coordinates(df, '\"quality\"', color = ['b', 'g', 'r', 'c', 'm', 'y', 'k'])
+        pd.plotting.parallel_coordinates(df, 'quality', color = ['b', 'g', 'r', 'c', 'm', 'y', 'k'])
         plt.show()
+
+        plt.figure(figsize = (20,8))
+        sns.countplot(data=df, x='quality')
+        plt.show()
+
+
