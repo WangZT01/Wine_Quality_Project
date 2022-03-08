@@ -17,7 +17,14 @@ class Datasets:
             self.data = np.loadtxt(f, delimiter=";")
             X_train = self.data[:, 0:11]
             y_train = self.data[:, -1]
-        return X_train, y_train
+
+        if "red" in self.location:
+            return X_train, [1 if i >= 6 else 0 for i in y_train]
+        elif "white" in self.location:
+            y_train = [0 if i <= 5 else i for i in y_train]
+            y_train = [1 if i == 6 else i for i in y_train]
+            y_train = [2 if i > 6 else i for i in y_train]
+            return X_train, y_train
 
     def displayLocation(self):
         print('Location is : %s' % self.location)
