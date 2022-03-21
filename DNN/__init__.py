@@ -32,7 +32,7 @@ class DeepNeuralNetworks:
         X_train = scaler.fit_transform(X_train)
         return X_train
 
-    def Optimization(self, X_train, y_train, X_test, y_test, title):
+    def MLP_GridSearch(self, X_train, y_train, X_test, y_test, title):
         X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, train_size=0.9)
         mlp = MLPClassifier(max_iter = 100)
         parameter_space = {
@@ -63,4 +63,4 @@ if __name__ == '__main__':
     X = dnn.normalization(X)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.35, random_state = 25)
     dnn.mlp_classifier(X_train, y_train, X_test, y_test, "white wine")
-    dnn.Optimization(X_train, y_train, X_test, y_test, "white wine")
+    dnn.MLP_GridSearch(X_train, y_train, X_test, y_test, "white wine")
