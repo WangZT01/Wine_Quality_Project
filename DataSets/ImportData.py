@@ -7,6 +7,7 @@ class Datasets:
     'save dataset\'s location'
     features = []
     data = []
+    data_panda = pd.DataFrame()
     def __init__(self, location):
         self.location = location
 
@@ -57,12 +58,8 @@ class Datasets:
         pic = pd.plotting.radviz(df,'\"quality\"')
         plt.show()
         '''
-        plt.figure(figsize = (20,8))
-        pd.plotting.parallel_coordinates(df, 'quality', color = ['b', 'g', 'r', 'c', 'm', 'y', 'k'])
-        plt.show()
-
-        plt.figure(figsize = (20,8))
-        sns.countplot(data=df, x='quality')
-        plt.show()
+        self.data_panda = df
+        print(df)
+        return df
 
 
