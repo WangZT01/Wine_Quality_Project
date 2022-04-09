@@ -11,7 +11,7 @@ class Datasets:
     def __init__(self, location):
         self.location = location
 
-    def loadData(self):
+    def loadData_binary(self):
         ' ".\\DataSets\\winequality-red.csv" '
         with open(self.location, encoding='utf-8') as f:
             self.features = np.loadtxt(f, str, delimiter = ";", max_rows = 1)
@@ -22,10 +22,39 @@ class Datasets:
         if "red" in self.location:
             return X_train, [1 if i >= 6 else 0 for i in y_train]
         elif "white" in self.location:
-            y_train = [0 if i <= 5 else i for i in y_train]
-            y_train = [1 if i == 6 else i for i in y_train]
-            y_train = [2 if i > 6 else i for i in y_train]
+            return X_train, [1 if i >= 6 else 0 for i in y_train]
+
+    def loadData_origin(self):
+        ' ".\\DataSets\\winequality-red.csv" '
+        with open(self.location, encoding='utf-8') as f:
+            self.features = np.loadtxt(f, str, delimiter = ";", max_rows = 1)
+            self.data = np.loadtxt(f, delimiter=";")
+            X_train = self.data[:, 0:11]
+            y_train = self.data[:, -1]
+        if "red" in self.location:
             return X_train, y_train
+        elif "white" in self.location:
+            return X_train, y_train
+
+    def loadData_cut_features(self):
+        ' ".\\DataSets\\winequality-red.csv" '
+        with open(self.location, encoding='utf-8') as f:
+            self.features = np.loadtxt(f, str, delimiter = ";", max_rows = 1)
+            self.data = np.loadtxt(f, delimiter=";")
+            X_train = self.data[:, 0:11]
+            y_train = self.data[:, -1]
+
+
+        X_number = [ np.where(self.features == x) for x in ['alcohol', 'sulphates', 'citric acid', 'volatile acidity']]
+        X_train_cut_features = self.data[:, X_number[0][0]]
+        X_number = X_number[1:]
+        for index in X_number:
+            X_train_cut_features = np.append(X_train_cut_features, self.data[:, index[0]], axis=1)
+
+        if "red" in self.location:
+            return X_train_cut_features, y_train
+        elif "white" in self.location:
+            return X_train_cut_features, y_train
 
     def displayLocation(self):
         print('Location is : %s' % self.location)
@@ -54,12 +83,17 @@ class Datasets:
             self.features[11]: self.data[:, 11],
 
         })
+
         '''
         pic = pd.plotting.radviz(df,'\"quality\"')
         plt.show()
         '''
+
         self.data_panda = df
-        print(df)
+        pd.set_option('display.max_columns', None)
+        # 显示所有行
+        pd.set_option('display.max_rows', None)
+        print(df.describe())
         return df
 
 

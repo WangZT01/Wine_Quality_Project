@@ -1,12 +1,16 @@
+import joblib
 import numpy as np
 import pandas as pd
-from sklearn.metrics import confusion_matrix
+from matplotlib import pyplot as plt
+from sklearn.metrics import confusion_matrix, plot_confusion_matrix
+from sklearn.preprocessing import StandardScaler
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import classification_report
 from DataSets.ImportData import Datasets
-
+import warnings
+warnings.filterwarnings('ignore')
 
 class DecisionTree:
     data = []
@@ -14,90 +18,107 @@ class DecisionTree:
     def __init__(self, data):
         self.data = data
 
-    def splitdataset(self):
-        # Separating the target variable
-        #'/Users/jinfenghu/COMP 432/COMP6321_Project-master/DataSets/winequality-red.csv'
-        with open('/Users/jinfenghu/COMP 432/COMP6321_Project-master/DataSets/winequality-red.csv', encoding='utf-8') as f:
-            self.features = np.loadtxt(f, str, delimiter=";", max_rows=1)
-            self.data = np.loadtxt(f, delimiter=";")
-        X = self.data[:, 0:11]
-        Y = self.data[:, -1]
-        if "red" in self.location:
-            return X, [1 if i >= 6 else 0 for i in Y]
-        elif "white" in self.location:
-            Y = [0 if i <= 5 else i for i in Y]
-            Y = [1 if i == 6 else i for i in Y]
-            Y = [2 if i > 6 else i for i in Y]
-            return X,Y
-        # Splitting the dataset into train and test
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, Y, test_size=0.35, random_state=25)
+    def dt_classifier(self, X_train, y_train, X_test, y_test):
+        print(" Decision Tree classifier")
 
-        return X, Y, X_train, X_test, y_train, y_test
-    # Function to perform training with giniIndex.
-    def train_using_gini(X_train, X_test, y_train):
-        # Creating the classifier object
-        clf_gini = DecisionTreeClassifier(criterion="gini",random_state=100,
-                                          max_depth=3, min_samples_leaf=10)
+        dt = DecisionTreeClassifier()
+        dt.fit(X_train, y_train)
+        predict = dt.predict(X_test)  # prediction
+        print("training rate is :{:.2f}%".format(accuracy_score(y_test, predict) * 100))
+        print('score ：{:.2f}'.format(dt.score(X_test, y_test)))
+        print(classification_report(predict, y_test))
+        print(dt.get_params())
+        print(dt)
+        return dt
 
-        # Performing training
-        clf_gini.fit(X_train, y_train)
-        return clf_gini
+    def normalization(self, X_train):
+        scaler = StandardScaler()
+        X_train = scaler.fit_transform(X_train)
+        return X_train
 
-    # Function to perform training with entropy.
-    def tarin_using_entropy(X_train, X_test, y_train):
-        # Decision tree with entropy
-        clf_entropy = DecisionTreeClassifier(
-            criterion="entropy", random_state=100,
-            max_depth=3, min_samples_leaf=10)
+    def DT_GridSearch(self, X_train, y_train, X_test, y_test):
+        X_train, X_valid, y_train, y_valid = train_test_split(X_train, y_train, train_size=0.9)
+        rf = DecisionTreeClassifier()
+        parameter_space = {
+            'criterion': ["gini", "entropy"],
+            'splitter': ['best', 'random'],
+            'max_depth': [x for x in range(1, 20, 2)],
+            'max_features': ['auto', 'sqrt', 'log2']
+        }
+        clf = GridSearchCV(rf, parameter_space, n_jobs=-1, cv=5)
+        clf.fit(X_train, y_train)  # X is train samples and y is the corresponding labels
+        df = pd.DataFrame(clf.cv_results_)
 
-        # Performing training
-        clf_entropy.fit(X_train, y_train)
-        return clf_entropy
+        predict = clf.predict(X_test)
+        print("training rate is :{:.2f}%".format(accuracy_score(y_test, predict) * 100))
+        print('score ：{:.2f}'.format(clf.score(X_test, y_test)))
+        print(classification_report(predict, y_test))
 
-    # Function to make predictions
-    def prediction(X_test, clf_object):
-        # Predicton on test with giniIndex
-        y_pred = clf_object.predict(X_test)
-        print("Predicted values:")
-        print(y_pred)
-        return y_pred
+        print('Best score is: ', clf.best_score_)
+        print('Best prarmeters is: ', clf.best_params_)
 
-    # Function to calculate accuracy
-    def cal_accuracy(y_test, y_pred):
-        print("Confusion Matrix: ",
-              confusion_matrix(y_test, y_pred))
-
-        print("Accuracy : ",
-              accuracy_score(y_test, y_pred) * 100)
-
-        #print("Report : ",
-        #      classification_report(y_test, y_pred))
+        print(clf.best_estimator_)
+        return clf.best_estimator_
 
 
-    # Calling main function
-    if __name__ == "__main__":
-        # Building Phase
-        location_red = '/Users/jinfenghu/COMP 432/COMP6321_Project-master/DataSets/winequality-red.csv'
-        datasets_red = Datasets(location_red)
-        datasets_red.displayLocation()
-        X, y = datasets_red.loadData()
-        datasets_red.getFeatures()
 
-        data = datasets_red.getData()
-        datasets_red.displayData()
-        X, Y, X_train, X_test, y_train, y_test = splitdataset(data)
-        clf_gini = train_using_gini(X_train, X_test, y_train)
-        clf_entropy = tarin_using_entropy(X_train, X_test, y_train)
-        # Operational Phase
-        print("Results Using Gini Index:")
+def training(address, type):
 
-        # Operational Phase
-        # Prediction using gini
-        y_pred_gini = prediction(X_test, clf_gini)
-        cal_accuracy(data.y_test, y_pred_gini)
+    location = address
+    datasets = Datasets(location)
 
-        print("Results Using Entropy:")
-        # Prediction using entropy
-        y_pred_entropy = prediction(X_test, clf_entropy)
-        cal_accuracy(data.y_test, y_pred_entropy)
+
+    if type.startswith('origin'):
+        X, y = datasets.loadData_origin()
+    elif type.startswith('binary'):
+        X, y = datasets.loadData_binary()
+
+
+    data = datasets.getData()
+    dt = DecisionTree(data)
+    X = dt.normalization(X)
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.35, random_state = 25)
+    model = dt.dt_classifier(X_train, y_train, X_test, y_test)
+    model_Grid = dt.DT_GridSearch(X_train, y_train, X_test, y_test)
+
+    model_score = model.score(X_test, y_test)
+    model_Grid_score = model_Grid.score(X_test, y_test)
+
+    if model_score> model_Grid_score:
+        print(model_score)
+        #joblib.dump(model, "../Model/Train_origindata/DNN_red_data.pkl")
+        plot_confusion_matrix(model, X_test, y_test)
+        plt.show()
+        return model
+    else:
+        print(model_Grid_score)
+        #joblib.dump(model_Grid, "../Model/Train_origindata/DNN_red_data.pkl")
+        plot_confusion_matrix(model_Grid,X_test, y_test)
+        plt.show()
+
+        return model_Grid
+
+def save_model(model, data_address, type):
+    model_type = 'Train_' + type + 'data'
+    if data_address.find('red') != -1:
+        model_name = 'DecisionTree_' + 'red' + '_data.pkl'
+    if data_address.find('white') != -1:
+        model_name = 'DecisionTree_' + 'white' + '_data.pkl'
+    model_address = '../Model/' + model_type + '/' + model_name
+
+    joblib.dump(model, model_address)
+
+if __name__ == '__main__':
+
+
+    address_red = "../DataSets/winequality-red.csv"
+    address_white = "../DataSets/winequality-white.csv"
+
+    data_type = ['origin', 'binary']
+
+    for type in data_type:
+        model = training(address_red, type)
+        save_model(model, address_red, type)
+        model = training(address_white, type)
+        save_model(model, address_white, type)
