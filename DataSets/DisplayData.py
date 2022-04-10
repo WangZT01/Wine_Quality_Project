@@ -4,11 +4,19 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from DataSets.ImportData import Datasets
 
+
+'''
+
+This class is used to visualize data.
+'''
 class DisplayData:
     def __init__(self, data_panda):
         self.data_panda = data_panda
 
 
+    '''
+    Output the number of data.
+    '''
     def display_Data_Quantity(self):
 
         plt.figure(figsize=(20, 8))
@@ -17,7 +25,9 @@ class DisplayData:
             ax.annotate('{:.1f}'.format(p.get_height()), (p.get_x() + 0.25, p.get_height() + 0.01))
         plt.show()
 
-
+    '''
+    Output the Pearson coefficient of features.
+    '''
     def display_Data_Pairwise(self, df):
         sns.set_style("dark")
         plt.figure(figsize=(10, 8))
@@ -30,6 +40,9 @@ class DisplayData:
         plt.savefig('../Images/Pairwise.jpg')
         plt.show()
 
+    '''
+    Output the relation between quality and features.
+    '''
     def display_Data_Quality(self, df):
         sns.set_style('ticks')
         sns.set_context("notebook", font_scale=1.1)

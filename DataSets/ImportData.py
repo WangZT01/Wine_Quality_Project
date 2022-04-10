@@ -3,6 +3,11 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+'''
+
+This class is used to import data.
+'''
+
 class Datasets:
     'save dataset\'s location'
     features = []
@@ -11,6 +16,10 @@ class Datasets:
     def __init__(self, location):
         self.location = location
 
+    '''
+
+    This function is used to import the two-class data.
+    '''
     def loadData_binary(self):
         ' ".\\DataSets\\winequality-red.csv" '
         with open(self.location, encoding='utf-8') as f:
@@ -24,6 +33,10 @@ class Datasets:
         elif "white" in self.location:
             return X_train, [1 if i >= 6 else 0 for i in y_train]
 
+    '''
+
+    This function is used to import the original data.
+    '''
     def loadData_origin(self):
         ' ".\\DataSets\\winequality-red.csv" '
         with open(self.location, encoding='utf-8') as f:
@@ -67,6 +80,10 @@ class Datasets:
     def getData(self):
         return self.data
 
+    '''
+
+    This function is used to transfer the data to dataframe
+    '''
     def displayData(self):
         df = pd.DataFrame({
             self.features[0]: self.data[:, 0],
