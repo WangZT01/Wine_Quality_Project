@@ -28,7 +28,6 @@ class DecisionTree:
         print('score ：{:.2f}'.format(dt.score(X_test, y_test)))
         print(classification_report(predict, y_test))
         print(dt.get_params())
-        print(dt)
         return dt
 
     def normalization(self, X_train):

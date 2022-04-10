@@ -31,8 +31,8 @@ class DisplayData:
         plt.show()
 
     def display_Data_Quality(self, df):
-        sns.set_style('ticks')  # 设置图表主题背景为十字叉
-        sns.set_context("notebook", font_scale=1.1)  # 设置图表样式
+        sns.set_style('ticks')
+        sns.set_context("notebook", font_scale=1.1)
 
         colnm = df.columns.tolist()[:11]
 
@@ -46,13 +46,10 @@ class DisplayData:
         plt.tight_layout()
         print("\nFigure: Physicochemical Properties and Wine Quality by Boxplot")
         plt.show()
-    def dispaly_radviz(self, df):
-        pd.plotting.radviz(df, 'quality')
-        plt.show()
 
 if __name__ == '__main__':
 
-    '''
+
     location_red = "..\\DataSets\\winequality-red.csv"
     datasets_red = Datasets(location_red)
     datasets_red.loadData()
@@ -62,7 +59,7 @@ if __name__ == '__main__':
     display.display_Data_Quantity()
     display.display_Data_Pairwise(df)
     display.display_Data_Quality()
-    '''
+
 
     location_white = "..\\DataSets\\winequality-white.csv"
     datasets_white = Datasets(location_white)
